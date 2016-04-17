@@ -8,10 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by quanhao.nqh on 2016/4/17.
@@ -35,17 +32,17 @@ public class XssIntecptor extends HandlerInterceptorAdapter {
     }
 
     public static void filter(Object object) throws Exception {
-        //TODO  如果针对collection怎么处理，求指导
-        //
-        if (object instanceof List) {
-            List list = (List) object;
-            for (int i = 0; i <list.size() ; i++) {
-                Object listElement = list.get(i);
-                if (listElement.getClass().equals(String.class)){
-                    list.set(i , StringEscapeUtils.escapeHtml(String.valueOf(listElement)));
-                }else {
-                    filter(listElement);
+        if (object instanceof Collection){
+            Collection collection = (Collection)object;
+            List<String> toDelete = new ArrayList<String>();
+            for (Object value : collection) {
+                if (value.getClass().equals(String.class) ){
+                    toDelete.add(String.valueOf(value));
                 }
+            }
+            for (String s : toDelete) {
+                collection.remove(s);
+                collection.add(StringEscapeUtils.escapeHtml(s));
             }
         } else if (object instanceof Map) {
             Map map = (Map) object;

@@ -11,6 +11,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by quanhao.nqh on 2016/4/17.
@@ -34,25 +35,30 @@ public class XssIntecptor extends HandlerInterceptorAdapter {
     }
 
     public static void filter(Object object) throws Exception {
-        if (object == null){
-            return;
-        }
+        //TODO  如果针对collection怎么处理，求指导
         //
         if (object instanceof List) {
             List list = (List) object;
             for (int i = 0; i <list.size() ; i++) {
                 Object listElement = list.get(i);
                 if (listElement.getClass().equals(String.class)){
-                    list.set(i , "dddd");
+                    list.set(i , StringEscapeUtils.escapeHtml(String.valueOf(listElement)));
                 }else {
                     filter(listElement);
                 }
             }
         } else if (object instanceof Map) {
             Map map = (Map) object;
-            Collection values = map.values();
-            Object[] objects = values.toArray();
-            filterArr(objects);
+            for (Object key : map.keySet()) {
+                Object value = map.get(key);
+                if (value != null){
+                    if (value.getClass().equals(String.class)){
+                        map.put(key , StringEscapeUtils.escapeHtml(String.valueOf(value)));
+                    }else {
+                        filter(value);
+                    }
+                }
+            }
         } else if (object.getClass().isArray()) {
             Object[] objects = (Object[]) object;
             filterArr(objects);
@@ -73,9 +79,7 @@ public class XssIntecptor extends HandlerInterceptorAdapter {
                 } else {
                     filter(declaredField.get(object));
                 }
-
             }
-
         }
     }
 
@@ -86,7 +90,7 @@ public class XssIntecptor extends HandlerInterceptorAdapter {
         for (int i = 0; i < objectArr.length; i++) {
             Object arrElem = objectArr[i];
             if (arrElem.getClass().equals(String.class)) {
-                objectArr[i] = "替换后的";
+                objectArr[i] =  StringEscapeUtils.escapeHtml(String.valueOf(arrElem));
             } else {
                 filter(arrElem);
             }

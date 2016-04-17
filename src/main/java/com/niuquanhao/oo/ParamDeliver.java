@@ -4,38 +4,24 @@ package com.niuquanhao.oo;
  * Created by quanhao.nqh on 2016/4/17.
  */
 public class ParamDeliver {
-
     private String name;
-
+    public ParamDeliver(String name) {
+        this.name = name;
+    }
     public static void main(String[] args) {
-        String param1 = "111";
-        String param2 = "111";
-        String param3 = new String("111");   //String是常量
-
-        System.out.println(param1.equals(param2));  //输出true
-        System.out.println(param1.equals(param3));  //输出true
-
-        ParamDeliver paramDeliver = new ParamDeliver();
-        paramDeliver.setName("入参前数值");
-        System.out.println("方法外：" + paramDeliver);
-
-        test(paramDeliver);
-
-
-
-
+        ParamDeliver paramDeliver = new ParamDeliver("入参前数值");
+        invalid(paramDeliver);
+        System.out.println(paramDeliver.getName());
+        valid(paramDeliver);
+        System.out.println(paramDeliver.getName());
     }
-
-    private static void test(ParamDeliver paramDeliver){
-        System.out.println("方法内：" + paramDeliver);
-        ParamDeliver paramDeliverInner = new ParamDeliver();
-        paramDeliver.setName("入参后数值");
-        System.out.println("内部对象：" + paramDeliverInner);
-
-        paramDeliver = paramDeliverInner;
-
+    private static void invalid(ParamDeliver paramDeliver){
+        ParamDeliver paramDeliverInner = new ParamDeliver("入参后数值");
+        paramDeliver = paramDeliverInner;//这一行为什么没有实际作用？？？  因为方法内的paramDeliver和main方法中定义的不是一个
     }
-
+    private static void valid(ParamDeliver paramDeliver){
+        paramDeliver.setName("入参后的值");
+    }
     public String getName() {
         return name;
     }

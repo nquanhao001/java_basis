@@ -32,12 +32,17 @@ public class XssIntecptor extends HandlerInterceptorAdapter {
     }
 
     public static void filter(Object object) throws Exception {
+        if (object == null){
+            return;
+        }
         if (object instanceof Collection){
             Collection collection = (Collection)object;
             List<String> toDelete = new ArrayList<String>();
             for (Object value : collection) {
                 if (value.getClass().equals(String.class) ){
                     toDelete.add(String.valueOf(value));
+                }else {
+                    filter(value);
                 }
             }
             for (String s : toDelete) {
